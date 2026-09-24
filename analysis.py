@@ -4,8 +4,15 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv("sales_data.csv")
 
-X = df[["month", "ad_spend", "price", "competitor_price"]]
-y = df["units_sold"]
+# Fix 1: drop rows with missing or invalid values before fitting
+df_clean = df[
+    df["units_sold"].notna() &
+    (df["ad_spend"] > 0) &
+    (df["price"] > 0)
+].copy()
+
+X = df_clean[["month", "ad_spend", "price", "competitor_price"]]
+y = df_clean["units_sold"]
 
 model = LinearRegression()
 model.fit(X, y)
@@ -17,4 +24,6 @@ plt.scatter(y, model.predict(X))
 plt.xlabel("Actual units_sold")
 plt.ylabel("Predicted units_sold")
 plt.title("Actual vs Predicted")
-plt.save("regression_plot.png")
+
+# Fix 2: plt.savefig(), not plt.save()
+plt.savefig("regression_plot.png")
